@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Command, Plus, Star, GitBranch, Users } from 'lucide-react';
+import { Search, Command, Star, Users, Sparkles, Package, Github } from 'lucide-react';
 import { validateSearchQuery } from '../utils/security';
 
 const Header = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCategory }) => {
@@ -23,16 +23,20 @@ const Header = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCate
                 <span className="text-xl font-semibold text-foreground font-geist">PromptHub</span>
               </div>
               
-              {/* Navigation Links - Simplified */}
-              <div className="hidden md:flex items-center gap-6">
+              {/* Navigation Links - Modern */}
+              <div className="hidden md:flex items-center gap-8">
                 <button 
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors font-geist"
+                  className="group relative text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-300 font-geist flex items-center gap-2"
                   onClick={() => setSelectedCategory("All")}
                 >
-                  Browse
+                  <Sparkles className="h-4 w-4" />
+                  Explore
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full"></span>
                 </button>
-                <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors font-geist">
-                  Pricing
+                <button className="group relative text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-300 font-geist flex items-center gap-2">
+                  <Package className="h-4 w-4" />
+                  Collections
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
             </div>
@@ -48,11 +52,10 @@ const Header = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCate
                 <span>Search</span>
               </div>
               
-              
-              {/* User Menu Placeholder */}
-              <div className="h-8 w-8 rounded-lg bg-muted border border-border/30 flex items-center justify-center">
-                <span className="text-xs font-medium text-foreground font-geist">U</span>
-              </div>
+              {/* GitHub Link */}
+              <button className="group h-9 w-9 rounded-lg bg-muted/50 hover:bg-muted/80 border border-border/30 hover:border-border/50 flex items-center justify-center transition-all duration-300">
+                <Github className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              </button>
             </div>
           </div>
         </div>
@@ -116,12 +119,12 @@ const Header = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCate
               </button>
             </div>
 
-            {/* Stats - Raycast Style */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
+            {/* Stats - Modern Style */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-lg mx-auto">
               <div className="flex flex-col items-center">
                 <div className="inline-flex items-center gap-2 rounded-lg bg-muted/30 border border-border/20 px-4 py-2 text-sm font-medium text-foreground font-geist">
-                  <span className="h-2 w-2 rounded-full bg-accent" />
-                  8 prompts
+                  <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+                  9 prompts
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground font-geist">Ready to use</p>
               </div>
@@ -132,13 +135,6 @@ const Header = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCate
                   7 categories
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground font-geist">Organized collections</p>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div className="inline-flex items-center gap-2 rounded-lg bg-muted/30 border border-border/20 px-4 py-2 text-sm font-medium text-foreground font-geist">
-                  <span>18K downloads</span>
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground font-geist">Community trusted</p>
               </div>
             </div>
           </div>

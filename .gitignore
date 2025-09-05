@@ -1,1 +1,16 @@
 node_modules
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Development
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# Build outputs  
+dist/
+build/

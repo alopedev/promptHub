@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import Header from "./components/Header.jsx";
-import CategoryFilter from "./components/CategoryFilter.jsx";
+import PromptSuperpowers from "./components/PromptSuperpowers.jsx";
+import CuratedCollections from "./components/CuratedCollections.jsx";
 import PromptCard from "./components/PromptCard.jsx";
 import PromptModal from "./components/PromptModal.jsx";
 import { searchPrompts } from "./data/prompts";
@@ -11,15 +12,52 @@ import "./styles/globals.css";
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedSuperpower, setSelectedSuperpower] = useState(null);
   const [filteredPrompts, setFilteredPrompts] = useState([]);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Update filtered prompts when search or category changes
+  // Superpower to category/keyword mapping for filtering
+  const getSuperpowerKeywords = (superpower) => {
+    const superpowerMap = {
+      'automate': ['meeting', 'productivity', 'workflow'],
+      'analyze': ['data analysis', 'research', 'review'],
+      'create': ['creative writing', 'content', 'social media'],
+      'optimize': ['optimization', 'improvement', 'enhancement'],
+      'extract': ['summary', 'extract', 'facts'],
+      'translate': ['conversion', 'format', 'transform'],
+      'validate': ['review', 'check', 'validation'],
+      'brainstorm': ['ideas', 'creative', 'brainstorm'],
+      'summarize': ['summary', 'summarize', 'bullet points']
+    };
+    return superpowerMap[superpower] || [];
+  };
+
+  // Filter prompts by superpower
+  const filterBySuperpower = (prompts, superpower) => {
+    if (!superpower) return prompts;
+    
+    const keywords = getSuperpowerKeywords(superpower);
+    return prompts.filter(prompt => 
+      keywords.some(keyword => 
+        prompt.title.toLowerCase().includes(keyword) ||
+        prompt.description.toLowerCase().includes(keyword) ||
+        prompt.prompt.toLowerCase().includes(keyword)
+      )
+    );
+  };
+
+  // Update filtered prompts when search, category, or superpower changes
   useEffect(() => {
-    const results = searchPrompts(searchQuery, selectedCategory);
+    let results = searchPrompts(searchQuery, selectedCategory);
+    
+    // Apply superpower filtering
+    if (selectedSuperpower) {
+      results = filterBySuperpower(results, selectedSuperpower);
+    }
+    
     setFilteredPrompts(results);
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, selectedSuperpower]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -83,11 +121,15 @@ function App() {
         setSelectedCategory={setSelectedCategory}
       />
 
-      {/* Category Filter */}
-      <CategoryFilter
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
+
+      {/* Prompt Superpowers Explorer */}
+      <PromptSuperpowers
+        selectedSuperpower={selectedSuperpower}
+        onSuperpowerSelect={setSelectedSuperpower}
       />
+
+      {/* Curated Collections */}
+      <CuratedCollections />
 
       {/* Main Content */}
       <main className="container mx-auto max-w-7xl px-6 py-12">
@@ -100,6 +142,13 @@ function App() {
                 <span className="text-foreground font-semibold">
                   "{searchQuery}"
                 </span>
+              </>
+            ) : selectedSuperpower ? (
+              <>
+                <span className="text-foreground font-semibold">
+                  {selectedSuperpower.toUpperCase()}
+                </span>
+                {" "}Superpowers
               </>
             ) : selectedCategory === "All" ? (
               "All Prompts"
@@ -137,6 +186,7 @@ function App() {
               onClick={() => {
                 setSearchQuery("");
                 setSelectedCategory("All");
+                setSelectedSuperpower(null);
               }}
               className="btn-secondary px-6 py-3"
             >
@@ -145,30 +195,51 @@ function App() {
             </button>
           </div>
         ) : (
-          /* Prompts Grid - Enhanced with Stagger */
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {filteredPrompts.map((prompt, index) => (
-              <div
-                key={prompt.id}
-                className={`animate-fade-in animate-scale-in magnetic-hover rim-light glow-dynamic ${
-                  index <= 5 ? `animate-stagger-${Math.min(index + 1, 6)}` : ''
-                }`}
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <PromptCard
-                  prompt={prompt}
-                  onViewDetails={handlePromptClick}
-                />
-              </div>
-            ))}
+          /* Bento Grid - Modern Asymmetric Layout */
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-fr">
+            {filteredPrompts.map((prompt, index) => {
+              // Create asymmetric bento grid pattern
+              const gridPattern = [
+                'md:col-span-2 md:row-span-1', // wide
+                'md:col-span-1 md:row-span-2', // tall
+                'md:col-span-1 md:row-span-1', // small
+                'md:col-span-2 md:row-span-1', // wide
+                'md:col-span-1 md:row-span-1', // small
+                'md:col-span-1 md:row-span-1', // small
+                'md:col-span-1 md:row-span-2', // tall
+                'md:col-span-2 md:row-span-1', // wide
+                'md:col-span-1 md:row-span-1', // small
+              ];
+              
+              const gridClass = gridPattern[index % gridPattern.length];
+              
+              return (
+                <div
+                  key={prompt.id}
+                  className={`
+                    bento-item magnetic-hover animate-slide-in
+                    ${gridClass} ${index <= 5 ? `animate-stagger-${Math.min(index + 1, 6)}` : ''}
+                  `}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <PromptCard
+                    prompt={prompt}
+                    onViewDetails={handlePromptClick}
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
 
-        {/* Load More Button (Placeholder) */}
+        {/* Load More Button - Modern Style */}
         {filteredPrompts.length > 0 && filteredPrompts.length >= 6 && (
-          <div className="flex justify-center mt-16">
-            <button className="btn-ghost px-8 py-3 border border-border/30 hover:border-border/50 font-geist">
-              Load more prompts
+          <div className="flex justify-center mt-20">
+            <button className="btn-modern group text-foreground">
+              <span>Load more prompts</span>
+              <div className="ml-2 w-0 group-hover:w-4 transition-all duration-300 overflow-hidden">
+                <div className="w-4 h-4 rounded-full bg-accent/20 animate-pulse"></div>
+              </div>
             </button>
           </div>
         )}

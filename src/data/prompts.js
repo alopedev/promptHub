@@ -361,6 +361,20 @@ Please create:
    - Optimization opportunities
 
 Include variety in format, tone, and engagement type while maintaining brand consistency.`
+  },
+  {
+    id: '9',
+    title: 'Smart Text Summarizer',
+    description: 'Extract facts from any text and create structured bulletpoint summaries with relevant emoji indicators.',
+    category: 'Data Analysis',
+    author: 'David Park',
+    downloads: 1867,
+    dateCreated: '2024-01-18',
+    prompt: `Extract all facts from the text and summarize it in all relevant aspects in up to seven bulletpoints and a 1-liner summary. Pick a good matching emoji for every bullet point.
+
+Text: {selection}
+
+Summary:`
   }
 ];
 
