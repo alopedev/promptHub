@@ -1,4 +1,5 @@
 import React from 'react';
+import { User, Download, Calendar, ArrowUpRight, Copy, ExternalLink } from 'lucide-react';
 
 const PromptCard = ({ prompt, onViewDetails }) => {
   // Format download count for display
@@ -22,83 +23,91 @@ const PromptCard = ({ prompt, onViewDetails }) => {
     return `${Math.floor(diffDays / 365)} years ago`;
   };
 
-  // Category colors
-  const getCategoryColor = (category) => {
-    const colors = {
-      'Productivity': 'var(--accent-mint)',
-      'Marketing & Sales': 'var(--accent-coral)',
-      'Development & Programming': 'var(--accent-sky)',
-      'Creative Writing': 'var(--accent-saffron)',
-      'Data Analysis': '#8B5CF6',
-      'Education': '#F59E0B',
-      'Design & UX': '#EC4899'
+  // Category styles - Minimal grayscale with tiny accent indicators
+  const getCategoryStyle = (category) => {
+    // All categories use the same minimal gray styling
+    return 'bg-muted/30 text-muted-foreground border-border/20';
+  };
+
+  // Category indicator - subtle gray variations only (Linear.app style)
+  const getCategoryIndicator = (category) => {
+    const indicators = {
+      'Productivity': 'bg-accent',
+      'Marketing & Sales': 'bg-muted-foreground', 
+      'Development & Programming': 'bg-secondary',
+      'Creative Writing': 'bg-primary',
+      'Data Analysis': 'bg-accent',
+      'Education': 'bg-muted-foreground',
+      'Design & UX': 'bg-secondary'
     };
-    return colors[category] || 'var(--accent-sky)';
+    return indicators[category] || 'bg-muted-foreground';
   };
 
   return (
     <div 
-      className="glass glass-hover"
-      style={{
-        borderRadius: 'var(--radius-lg)',
-        padding: 'var(--spacing-lg)',
-        cursor: 'pointer',
-        height: 'fit-content'
-      }}
+      className="group card-raycast glass-hover cursor-pointer animate-fade-in font-geist glow-hover"
       onClick={() => onViewDetails(prompt)}
     >
-      {/* Category Badge */}
-      <div style={{ marginBottom: 'var(--spacing-md)' }}>
-        <span 
-          className="badge"
-          style={{
-            backgroundColor: getCategoryColor(prompt.category),
-            color: 'white',
-            fontWeight: 500
-          }}
-        >
-          {prompt.category}
-        </span>
+      {/* Card Header */}
+      <div className="flex items-start justify-between mb-4">
+        {/* Minimal Category Badge - Linear style */}
+        <div className={`badge-raycast ${getCategoryStyle(prompt.category)}`}>
+          <span className={`h-1 w-1 rounded-full ${getCategoryIndicator(prompt.category)}`} />
+          <span className="text-xs">{prompt.category}</span>
+        </div>
+        
+        {/* Action Icon */}
+        <ArrowUpRight className="h-4 w-4 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:text-foreground group-hover:scale-110" />
       </div>
 
       {/* Title and Description */}
-      <div style={{ marginBottom: 'var(--spacing-lg)' }}>
-        <h3 className="text-xl font-semibold mb-sm">
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-3 text-foreground group-hover:text-foreground transition-colors duration-200 line-clamp-2 font-geist">
           {prompt.title}
         </h3>
-        <p className="text-secondary text-sm" style={{ lineHeight: 1.5 }}>
+        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 font-geist">
           {prompt.description}
         </p>
       </div>
 
-      {/* Author and Stats */}
-      <div className="flex justify-between items-center text-sm">
-        <div className="flex items-center gap-sm text-tertiary">
-          <div className="flex items-center gap-xs">
-            <span>👤</span>
-            <span>{prompt.author}</span>
+      {/* Metadata */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground mb-4 font-geist">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <User className="h-3 w-3" />
+            <span className="font-medium">{prompt.author}</span>
           </div>
-          <span>•</span>
-          <span>{formatDate(prompt.dateCreated)}</span>
+          <div className="flex items-center gap-1.5">
+            <Calendar className="h-3 w-3" />
+            <span>{formatDate(prompt.dateCreated)}</span>
+          </div>
         </div>
         
-        <div className="flex items-center gap-xs text-secondary">
-          <span>⬇️</span>
+        <div className="flex items-center gap-1.5 font-medium">
+          <Download className="h-3 w-3" />
           <span>{formatDownloads(prompt.downloads)}</span>
         </div>
       </div>
 
-      {/* Action Hint */}
-      <div 
-        className="flex items-center justify-between mt-lg"
-        style={{
-          paddingTop: 'var(--spacing-md)',
-          borderTop: '1px solid var(--border-subtle)'
-        }}
-      >
-        <span className="text-xs text-tertiary">Click to preview and copy</span>
-        <div className="flex items-center gap-xs">
-          <span className="keycap">Enter</span>
+      {/* Footer Actions */}
+      <div className="flex items-center justify-between pt-4 border-t border-border/30">
+        <span className="text-xs text-muted-foreground font-geist">Click to preview</span>
+        
+        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+          <button 
+            className="inline-flex items-center gap-1.5 rounded-md bg-muted/30 hover:bg-muted/50 px-2 py-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors font-geist"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Handle quick copy
+            }}
+          >
+            <Copy className="h-3 w-3" />
+            Copy
+          </button>
+          <button className="btn-secondary text-xs py-1 px-2">
+            <ExternalLink className="h-3 w-3" />
+            View
+          </button>
         </div>
       </div>
     </div>

@@ -1,4 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Copy, User, Download, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from './ui/dialog';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import { validatePromptContent, copyRateLimit } from '../utils/security';
 
 const PromptModal = ({ prompt, isOpen, onClose, onCopy }) => {
@@ -14,24 +25,7 @@ const PromptModal = ({ prompt, isOpen, onClose, onCopy }) => {
     }
   }, [prompt]);
 
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      // Prevent background scrolling
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
+  // Remove the manual escape handling since Dialog handles it
 
   const handleCopy = async () => {
     // Rate limiting to prevent abuse
@@ -64,65 +58,38 @@ const PromptModal = ({ prompt, isOpen, onClose, onCopy }) => {
     }
   };
 
-  const handleBackgroundClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  if (!isOpen || !prompt) return null;
-
   return (
-    <div 
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-        padding: 'var(--spacing-lg)'
-      }}
-      onClick={handleBackgroundClick}
-    >
-      <div 
-        className="glass"
-        style={{
-          width: '100%',
-          maxWidth: '800px',
-          maxHeight: '90vh',
-          borderRadius: 'var(--radius-xl)',
-          padding: 'var(--spacing-2xl)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--spacing-lg)',
-          overflow: 'hidden'
-        }}
-      >
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-2xl font-bold mb-xs">{prompt.title}</h2>
-            <p className="text-secondary">{prompt.description}</p>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-2xl font-bold pr-6">{prompt?.title}</DialogTitle>
+          <DialogDescription className="text-base">
+            {prompt?.description}
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Author and Stats */}
+        <div className="flex items-center gap-6 pb-4 border-b">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <User className="h-4 w-4" />
+            <span>{prompt?.author}</span>
           </div>
-          <button 
-            onClick={onClose}
-            className="btn btn-ghost"
-            style={{ padding: 'var(--spacing-sm)' }}
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Download className="h-4 w-4" />
+            <span>{prompt?.downloads?.toLocaleString()}</span>
+          </div>
+          {prompt?.category && (
+            <Badge variant="secondary" className="text-xs">
+              {prompt.category}
+            </Badge>
+          )}
         </div>
 
         {/* Prompt Editor */}
-        <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <div className="flex-1 flex flex-col gap-4 py-4 min-h-0">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium">Interactive Prompt Editor</h3>
-            <span className="text-xs text-tertiary">Edit the prompt to fit your needs</span>
+            <h3 className="text-lg font-semibold">Interactive Prompt Editor</h3>
+            <span className="text-xs text-muted-foreground">Edit the prompt to fit your needs</span>
           </div>
           
           <textarea
@@ -132,70 +99,51 @@ const PromptModal = ({ prompt, isOpen, onClose, onCopy }) => {
               const validatedContent = validatePromptContent(e.target.value);
               setEditablePrompt(validatedContent);
             }}
-            className="input"
-            style={{
-              minHeight: '300px',
-              resize: 'vertical',
-              fontFamily: 'Monaco, "Cascadia Code", monospace',
-              fontSize: '0.875rem',
-              lineHeight: 1.6
-            }}
+            className="flex-1 min-h-[300px] resize-none rounded-lg border bg-muted/50 px-4 py-3 text-sm font-mono leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             placeholder="Your prompt will appear here..."
           />
           
-          <div className="text-xs text-tertiary">
-            💡 Tip: You can edit the prompt above to customize it for your specific use case
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>💡</span>
+            <span>Tip: You can edit the prompt above to customize it for your specific use case</span>
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="flex justify-between items-center" style={{ paddingTop: 'var(--spacing-md)', borderTop: '1px solid var(--border-subtle)' }}>
-          <div className="flex items-center gap-md text-sm text-secondary">
-            <div className="flex items-center gap-xs">
-              <span>👤</span>
-              <span>{prompt.author}</span>
-            </div>
-            <div className="flex items-center gap-xs">
-              <span>⬇️</span>
-              <span>{prompt.downloads.toLocaleString()}</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-sm">
-            <div className="flex items-center gap-xs text-xs text-tertiary">
-              <span className="keycap">Esc</span>
+        <DialogFooter className="pt-4 border-t">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                Esc
+              </kbd>
               <span>to close</span>
             </div>
             
-            <button
+            <Button
               onClick={handleCopy}
-              className={`btn ${isCopied ? 'btn-secondary' : isRateLimited ? 'btn-secondary' : 'btn-primary'}`}
               disabled={isRateLimited}
-              style={{
-                minWidth: '120px'
-              }}
+              className="min-w-[140px]"
             >
               {isRateLimited ? (
                 <>
-                  <span>⏳</span>
-                  <span>Rate Limited</span>
+                  <Clock className="h-4 w-4 mr-2" />
+                  Rate Limited
                 </>
               ) : isCopied ? (
                 <>
-                  <span className="animate-bounce-subtle">✅</span>
-                  <span>Copied!</span>
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                  Copied!
                 </>
               ) : (
                 <>
-                  <span>📋</span>
-                  <span>Copy Prompt</span>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Prompt
                 </>
               )}
-            </button>
+            </Button>
           </div>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
