@@ -23,16 +23,13 @@ const Header = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCate
                 <span className="text-xl font-semibold text-foreground font-geist">PromptHub</span>
               </div>
               
-              {/* Navigation Links - Raycast Style */}
+              {/* Navigation Links - Simplified */}
               <div className="hidden md:flex items-center gap-6">
                 <button 
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors font-geist"
                   onClick={() => setSelectedCategory("All")}
                 >
                   Browse
-                </button>
-                <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors font-geist">
-                  Templates
                 </button>
                 <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors font-geist">
                   Pricing
@@ -51,11 +48,6 @@ const Header = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCate
                 <span>Search</span>
               </div>
               
-              {/* Actions */}
-              <button className="btn-secondary text-sm font-geist">
-                <Plus className="h-4 w-4" />
-                Create
-              </button>
               
               {/* User Menu Placeholder */}
               <div className="h-8 w-8 rounded-lg bg-muted border border-border/30 flex items-center justify-center">
@@ -66,8 +58,8 @@ const Header = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCate
         </div>
       </nav>
 
-      {/* Hero Section - Premium Raycast Inspired */}
-      <section className="relative overflow-hidden gradient-hero">
+      {/* Hero Section - Enhanced Premium */}
+      <section className="relative overflow-hidden gradient-hero gradient-animated">
         {/* Premium background effects */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-b from-secondary/5 to-transparent rounded-full blur-3xl" />
@@ -113,15 +105,14 @@ const Header = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCate
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-              <button className="btn-raycast px-8 py-4 text-base font-geist glow-hover">
+              <button 
+                className="btn-raycast px-8 py-4 text-base font-geist glow-hover"
+                onClick={() => setSelectedCategory("All")}
+              >
                 <span className="flex items-center gap-2">
-                  Start building
+                  Browse Prompts
                   <div className="w-1 h-1 bg-accent rounded-full" />
                 </span>
-              </button>
-              <button className="btn-ghost px-8 py-4 text-base font-geist">
-                <GitBranch className="h-4 w-4" />
-                View on GitHub
               </button>
             </div>
 

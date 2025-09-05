@@ -145,12 +145,14 @@ function App() {
             </button>
           </div>
         ) : (
-          /* Prompts Grid - Raycast Style */
+          /* Prompts Grid - Enhanced with Stagger */
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {filteredPrompts.map((prompt, index) => (
               <div
                 key={prompt.id}
-                className="animate-fade-in"
+                className={`animate-fade-in animate-scale-in magnetic-hover rim-light glow-dynamic ${
+                  index <= 5 ? `animate-stagger-${Math.min(index + 1, 6)}` : ''
+                }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <PromptCard
@@ -181,7 +183,7 @@ function App() {
               <span className="text-lg font-semibold text-foreground font-geist">PromptHub</span>
             </div>
             <p className="text-sm text-muted-foreground font-geist">
-              Built with ❤️ for the AI community
+              PromptVault - Curated AI Prompts
             </p>
           </div>
         </div>
