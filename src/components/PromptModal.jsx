@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Copy,
   User,
@@ -18,6 +19,7 @@ import {
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { validatePromptContent, copyRateLimit } from "../utils/security";
+import { modalContent, fadeIn } from "../utils/animations";
 
 const PromptModal = ({ prompt, isOpen, onClose, onCopy }) => {
   const [isCopied, setIsCopied] = useState(false);

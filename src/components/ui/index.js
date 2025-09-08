@@ -14,3 +14,8 @@ export {
   DialogTitle,
   DialogDescription,
 } from "./dialog";
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
+export { ScrollArea, ScrollBar } from "./scroll-area";
+export { Skeleton } from "./skeleton";
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./tooltip";
+export { Separator } from "./separator";

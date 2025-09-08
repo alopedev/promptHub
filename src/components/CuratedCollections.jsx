@@ -91,7 +91,7 @@ const CuratedCollections = () => {
   };
 
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-20 overflow-hidden" data-section="collections">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.008)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.008)_1px,transparent_1px)] bg-[size:64px_64px]" />
       <div className="absolute top-20 right-32 w-72 h-72 bg-gradient-to-b from-accent/3 to-transparent rounded-full blur-3xl animate-pulse" />

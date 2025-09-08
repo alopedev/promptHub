@@ -4,40 +4,46 @@
 
 @layer base {
   :root {
-    /* Linear.app Pure Grayscale Theme - HSL Format */
-    --background: 0 0% 4%;           /* #090A0A - Pure black background */
-    --foreground: 0 0% 100%;         /* #FFFFFF - Pure white text */
-    --card: 240 2% 8%;               /* #141415 - Subtle card background */
-    --card-foreground: 0 0% 100%;    /* #FFFFFF - White text on cards */
-    --popover: 240 2% 10%;           /* #1A1A1B - Darker popover */
-    --popover-foreground: 0 0% 100%;
+    /* Modern Light Theme - Linear.app Inspired with Better Contrast */
+    --background: 0 0% 100%;          /* Pure white background */
+    --foreground: 0 0% 9%;           /* #171717 - Almost black with high contrast */
+    --card: 0 0% 100%;               /* Pure white cards */
+    --card-foreground: 0 0% 9%;      /* Dark text on cards */
+    --popover: 0 0% 100%;            /* White popover */
+    --popover-foreground: 0 0% 9%;
     
-    /* Primary - Medium gray for primary elements */
-    --primary: 240 1% 15%;           /* #262627 - Medium gray for primary elements */
-    --primary-foreground: 0 0% 100%; /* White text on dark backgrounds */
+    /* Primary - Linear-style precise blue */
+    --primary: 220 91% 51%;          /* #2563EB - Strong blue for better contrast */
+    --primary-foreground: 0 0% 100%; /* Pure white */
     
-    /* Secondary - Light gray for secondary elements */
-    --secondary: 240 1% 18%;         /* #2D2D2E - Light gray for secondary elements */
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary - Linear-style neutral */
+    --secondary: 210 40% 96%;        /* #F8FAFC - Very light background */
+    --secondary-foreground: 0 0% 9%; /* High contrast text */
     
-    /* Muted elements - Pure grayscale hierarchy */
-    --muted: 240 2% 10%;             /* #1A1A1B - Muted background */
-    --muted-foreground: 0 0% 63%;    /* #A0A0A0 - Medium gray text */
+    /* Muted elements - Better hierarchy */
+    --muted: 210 40% 96%;            /* #F8FAFC - Light background */
+    --muted-foreground: 0 0% 45%;    /* #737373 - Better contrast gray text */
     
-    /* Accent - Subtle gray accent */
-    --accent: 240 1% 25%;            /* #404041 - Subtle gray accent */
-    --accent-foreground: 0 0% 100%;  /* White text on gray */
+    /* Accent - Linear-style purple with better contrast */
+    --accent: 262 83% 51%;           /* #7C3AED - Darker purple for contrast */
+    --accent-foreground: 0 0% 100%;  /* Pure white text */
     
-    /* Destructive - Subtle red (only for errors) */
-    --destructive: 0 40% 35%;        /* #883A3A - Muted red for errors */
+    /* Destructive - High contrast red */
+    --destructive: 0 84% 47%;        /* #DC2626 - Darker red for contrast */
     --destructive-foreground: 0 0% 100%;
     
-    /* Borders and inputs - Linear-style borders */
-    --border: 240 1% 15%;            /* #262627 - Subtle borders */
-    --input: 240 2% 8%;              /* #141415 - Input background */
-    --ring: 240 1% 25%;              /* #404041 - Gray focus ring */
+    /* Borders and inputs - Linear-style precise borders */
+    --border: 214 32% 91%;           /* #E2E8F0 - Light border */
+    --input: 214 32% 91%;            /* #E2E8F0 - Input border */
+    --ring: 220 91% 51%;             /* Blue focus ring */
     
-    --radius: 0.5rem;                /* 8px - Linear's border radius */
+    --radius: 0.75rem;               /* 12px - Linear-style radius */
+    
+    /* Updated gradient variables with better contrast */
+    --gradient-primary: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+    --gradient-secondary: linear-gradient(135deg, #EC4899 0%, #EF4444 100%);
+    --gradient-accent: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);
+    --gradient-hero: linear-gradient(135deg, #2563EB 0%, #7C3AED 50%, #EC4899 100%);
   }
 
   .light {
@@ -105,19 +111,64 @@
 
   /* Modern CSS Trends 2024-2025 */
   
-  /* Enhanced Glassmorphism */
+  /* Enhanced Glassmorphism for Light Theme */
   .glass-panel {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+      0 8px 32px rgba(31, 38, 135, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
 
   .glass-strong {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 
+      0 12px 40px rgba(31, 38, 135, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  /* Modern Gradient Overlays */
+  .gradient-hero {
+    background: var(--gradient-hero);
+    background-size: 200% 200%;
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  /* Advanced Shadow System */
+  .shadow-glow {
+    box-shadow: 
+      0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 2px 4px rgba(0, 0, 0, 0.1),
+      0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-glow-lg {
+    box-shadow: 
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 4px 8px rgba(0, 0, 0, 0.12),
+      0 16px 48px rgba(0, 0, 0, 0.15);
+  }
+
+  .shadow-colorful {
+    box-shadow: 
+      0 4px 14px 0 rgba(102, 126, 234, 0.25),
+      0 10px 40px 0 rgba(102, 126, 234, 0.15);
   }
 
   /* Neumorphism/Soft UI */

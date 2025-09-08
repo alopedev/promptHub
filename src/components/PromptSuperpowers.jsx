@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { 
   Zap, 
   BarChart3, 
@@ -10,8 +11,11 @@ import {
   Lightbulb,
   List
 } from 'lucide-react';
+import { useSearch } from '../contexts/index.jsx';
+import { staggerContainer, staggerItem } from '../utils/animations';
 
-const PromptSuperpowers = ({ onSuperpowerSelect, selectedSuperpower }) => {
+const PromptSuperpowers = () => {
+  const { selectedSuperpower, setSelectedSuperpower } = useSearch();
   const superpowers = [
     {
       id: 'automate',
@@ -109,121 +113,118 @@ const PromptSuperpowers = ({ onSuperpowerSelect, selectedSuperpower }) => {
 
   const handleSuperpowerClick = (superpower) => {
     const newSelection = selectedSuperpower === superpower.id ? null : superpower.id;
-    onSuperpowerSelect(newSelection);
+    setSelectedSuperpower(newSelection);
   };
 
   return (
-    <section className="relative border-b border-border/30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="container mx-auto max-w-7xl px-6 py-16">
-        {/* Section Header */}
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-4 font-geist">
-            Prompt Superpowers
-          </h2>
-          <p className="text-muted-foreground font-geist max-w-2xl mx-auto">
-            Unlock your AI potential. Click any superpower to discover matching prompts.
-          </p>
-        </div>
+    <section className="relative py-24 border-b border-border/30">
+      <div className="container mx-auto max-w-7xl px-6">
+        {/* Linear-style Section Header */}
+        <motion.div 
+          className="mb-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.h2 
+            className="text-4xl font-bold text-foreground mb-6 font-geist"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Filter by Superpower
+          </motion.h2>
+          <motion.p 
+            className="text-muted-foreground font-geist max-w-2xl mx-auto text-lg"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Find the perfect prompt by selecting what you want to accomplish with AI.
+          </motion.p>
+        </motion.div>
 
-        {/* Organic Superpowers Layout */}
-        <div className="relative h-96 overflow-hidden">
-          {/* Background decorative elements */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:48px_48px] opacity-30" />
-          
+        {/* Modern Grid Layout - Linear Style */}
+        <motion.div 
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-12"
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+        >
           {superpowers.map((superpower) => {
             const IconComponent = superpower.icon;
             const isSelected = selectedSuperpower === superpower.id;
             
             return (
-              <div
+              <motion.div
                 key={superpower.id}
-                className="absolute transition-all duration-300 hover:scale-105 hover:z-10"
-                style={{
-                  top: superpower.position.top,
-                  left: superpower.position.left,
-                  transform: `rotate(${superpower.rotation})`,
-                }}
+                variants={staggerItem}
               >
-                <button
+                <motion.button
                   onClick={() => handleSuperpowerClick(superpower)}
                   className={`
-                    group relative inline-flex items-center gap-2 rounded-2xl border backdrop-blur-sm
-                    transition-all duration-300 font-geist
-                    hover:scale-110 hover:shadow-lg active:scale-95
-                    ${getSizeClasses(superpower.size)}
+                    w-full p-6 rounded-2xl border transition-all duration-200 font-geist
+                    flex flex-col items-center text-center gap-3
                     ${isSelected
-                      ? 'bg-primary text-primary-foreground border-primary/50 shadow-lg shadow-primary/20'
-                      : 'bg-card/60 text-foreground border-border/40 hover:bg-card/80 hover:border-border/60'
+                      ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20' 
+                      : 'bg-card border-border hover:border-border/60 hover:bg-card/80'
                     }
                   `}
-                  style={{
-                    transform: `rotate(${isSelected ? '0deg' : superpower.rotation})`,
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <IconComponent className={`${superpower.size === 'large' ? 'h-5 w-5' : 'h-4 w-4'}`} />
-                  <span className="tracking-wide">{superpower.name}</span>
+                  <motion.div
+                    className={`p-3 rounded-xl ${isSelected ? 'bg-primary-foreground/20' : 'bg-muted'}`}
+                    whileHover={{ rotate: 5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <IconComponent className="h-6 w-6" />
+                  </motion.div>
                   
-                  {/* Tooltip */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-card border border-border/50 rounded-lg text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
-                    {superpower.description}
+                  <div className="space-y-1">
+                    <div className="font-semibold text-sm">
+                      {superpower.name}
+                    </div>
+                    <div className={`text-xs ${isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
+                      {superpower.description}
+                    </div>
                   </div>
-
-                  {/* Glow effect when selected */}
-                  {isSelected && (
-                    <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-sm -z-10 animate-pulse" />
-                  )}
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             );
           })}
+        </motion.div>
 
-          {/* Floating particles effect */}
-          <div className="absolute top-20 left-20 w-2 h-2 bg-accent/30 rounded-full animate-float" />
-          <div className="absolute bottom-32 right-24 w-1 h-1 bg-muted-foreground/20 rounded-full animate-float" style={{ animationDelay: '2s' }} />
-          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-primary/20 rounded-full animate-float" style={{ animationDelay: '4s' }} />
-        </div>
-
-        {/* Selected superpower info */}
+        {/* Selected superpower info - Modern styling */}
         {selectedSuperpower && (
-          <div className="mt-8 text-center animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg text-sm text-foreground font-geist">
-              <span>Filtering by superpower:</span>
-              <span className="font-semibold">
+          <motion.div 
+            className="mt-12 text-center"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="inline-flex items-center gap-3 px-6 py-4 glass-strong border border-white/20 rounded-2xl shadow-colorful">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+              <span className="text-foreground font-medium">Filtering by:</span>
+              <span className="font-bold text-primary">
                 {superpowers.find(s => s.id === selectedSuperpower)?.name}
               </span>
-              <button
-                onClick={() => onSuperpowerSelect(null)}
-                className="ml-2 text-muted-foreground hover:text-foreground transition-colors"
+              <motion.button
+                onClick={() => setSelectedSuperpower(null)}
+                className="ml-2 w-6 h-6 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
                 ✕
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
-
-      {/* CSS for animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-10px) rotate(1deg); }
-          66% { transform: translateY(5px) rotate(-1deg); }
-        }
-        
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-out;
-        }
-        
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </section>
   );
 };

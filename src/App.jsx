@@ -1,63 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 import Header from "./components/Header.jsx";
 import PromptSuperpowers from "./components/PromptSuperpowers.jsx";
 import CuratedCollections from "./components/CuratedCollections.jsx";
 import PromptCard from "./components/PromptCard.jsx";
 import PromptModal from "./components/PromptModal.jsx";
-import { searchPrompts } from "./data/prompts";
-import { safeGetLocalStorage, safeSetLocalStorage } from "./utils/security";
+import FloatingElements from "./components/FloatingElements.jsx";
+import { AppProviders, useSearch, useUI } from "./contexts/index.jsx";
+import { staggerContainer, staggerItem, fadeInUp } from "./utils/animations";
 import "./styles/globals.css";
 
-function App() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedSuperpower, setSelectedSuperpower] = useState(null);
-  const [filteredPrompts, setFilteredPrompts] = useState([]);
-  const [selectedPrompt, setSelectedPrompt] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Superpower to category/keyword mapping for filtering
-  const getSuperpowerKeywords = (superpower) => {
-    const superpowerMap = {
-      'automate': ['meeting', 'productivity', 'workflow'],
-      'analyze': ['data analysis', 'research', 'review'],
-      'create': ['creative writing', 'content', 'social media'],
-      'optimize': ['optimization', 'improvement', 'enhancement'],
-      'extract': ['summary', 'extract', 'facts'],
-      'translate': ['conversion', 'format', 'transform'],
-      'validate': ['review', 'check', 'validation'],
-      'brainstorm': ['ideas', 'creative', 'brainstorm'],
-      'summarize': ['summary', 'summarize', 'bullet points']
-    };
-    return superpowerMap[superpower] || [];
-  };
-
-  // Filter prompts by superpower
-  const filterBySuperpower = (prompts, superpower) => {
-    if (!superpower) return prompts;
-    
-    const keywords = getSuperpowerKeywords(superpower);
-    return prompts.filter(prompt => 
-      keywords.some(keyword => 
-        prompt.title.toLowerCase().includes(keyword) ||
-        prompt.description.toLowerCase().includes(keyword) ||
-        prompt.prompt.toLowerCase().includes(keyword)
-      )
-    );
-  };
-
-  // Update filtered prompts when search, category, or superpower changes
-  useEffect(() => {
-    let results = searchPrompts(searchQuery, selectedCategory);
-    
-    // Apply superpower filtering
-    if (selectedSuperpower) {
-      results = filterBySuperpower(results, selectedSuperpower);
-    }
-    
-    setFilteredPrompts(results);
-  }, [searchQuery, selectedCategory, selectedSuperpower]);
+// Main App content component using contexts
+const AppContent = () => {
+  // Use contexts for state management
+  const { 
+    searchQuery, 
+    setSearchQuery, 
+    selectedCategory, 
+    setSelectedCategory, 
+    selectedSuperpower, 
+    setSelectedSuperpower, 
+    filteredPrompts, 
+    resetFilters 
+  } = useSearch();
+  
+  const { 
+    selectedPrompt, 
+    isModalOpen, 
+    handlePromptClick, 
+    handleCloseModal, 
+    handleCopyPrompt 
+  } = useUI();
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -77,62 +51,32 @@ function App() {
     return () => document.removeEventListener("keydown", handleKeyboard);
   }, []);
 
-  const handlePromptClick = (prompt) => {
-    setSelectedPrompt(prompt);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPrompt(null);
-  };
-
-  const handleCopyPrompt = (prompt) => {
-    if (!prompt || !prompt.id) {
-      console.warn("Invalid prompt data");
-      return;
-    }
-
-    const downloadKey = `prompt-${prompt.id}-downloads`;
-    const currentDownloads = safeGetLocalStorage(downloadKey) || "0";
-    const currentCount = parseInt(currentDownloads, 10) || 0;
-    const newDownloads = currentCount + 1;
-
-    if (newDownloads > 1000000) {
-      console.warn("Download count exceeds reasonable limit");
-      return;
-    }
-
-    const success = safeSetLocalStorage(downloadKey, newDownloads.toString());
-    if (success) {
-      console.log(`Copied prompt: ${prompt.title}`);
-    } else {
-      console.warn("Failed to update download count");
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Floating Background Elements */}
+      <FloatingElements />
+      
       {/* Header with Hero Section */}
-      <Header
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-      />
+      <Header />
 
-
-      {/* Prompt Superpowers Explorer */}
-      <PromptSuperpowers
-        selectedSuperpower={selectedSuperpower}
-        onSuperpowerSelect={setSelectedSuperpower}
-      />
-
-      {/* Curated Collections */}
+      {/* Curated Collections - Featured first */}
       <CuratedCollections />
 
-      {/* Main Content */}
-      <main className="container mx-auto max-w-7xl px-6 py-12">
+      {/* Prompt Superpowers Explorer - Filter before content */}
+      <PromptSuperpowers />
+
+      {/* Main Content with Page Transition */}
+      <motion.main 
+        className="container mx-auto max-w-7xl px-6 py-12 relative z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 100, 
+          damping: 15,
+          delay: 0.5 
+        }}
+      >
         {/* Results Header */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-foreground mb-3 font-geist">
@@ -183,11 +127,7 @@ function App() {
             </p>
             
             <button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("All");
-                setSelectedSuperpower(null);
-              }}
+              onClick={resetFilters}
               className="btn-secondary px-6 py-3"
             >
               <span className="mr-2">✨</span>
@@ -195,41 +135,32 @@ function App() {
             </button>
           </div>
         ) : (
-          /* Bento Grid - Modern Asymmetric Layout */
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-fr">
-            {filteredPrompts.map((prompt, index) => {
-              // Create asymmetric bento grid pattern
-              const gridPattern = [
-                'md:col-span-2 md:row-span-1', // wide
-                'md:col-span-1 md:row-span-2', // tall
-                'md:col-span-1 md:row-span-1', // small
-                'md:col-span-2 md:row-span-1', // wide
-                'md:col-span-1 md:row-span-1', // small
-                'md:col-span-1 md:row-span-1', // small
-                'md:col-span-1 md:row-span-2', // tall
-                'md:col-span-2 md:row-span-1', // wide
-                'md:col-span-1 md:row-span-1', // small
-              ];
-              
-              const gridClass = gridPattern[index % gridPattern.length];
-              
-              return (
-                <div
+          /* Clean Grid - Uniform Card Layout with Linear.app Style */
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+          >
+            <AnimatePresence>
+              {filteredPrompts.map((prompt, index) => (
+                <motion.div
                   key={prompt.id}
-                  className={`
-                    bento-item magnetic-hover animate-slide-in
-                    ${gridClass} ${index <= 5 ? `animate-stagger-${Math.min(index + 1, 6)}` : ''}
-                  `}
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  layout
+                  variants={staggerItem}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="h-full"
                 >
                   <PromptCard
                     prompt={prompt}
                     onViewDetails={handlePromptClick}
                   />
-                </div>
-              );
-            })}
-          </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         )}
 
         {/* Load More Button - Modern Style */}
@@ -243,7 +174,7 @@ function App() {
             </button>
           </div>
         )}
-      </main>
+      </motion.main>
 
       {/* Footer */}
       <footer className="border-t border-border/30 bg-card/20">
@@ -268,6 +199,15 @@ function App() {
         onCopy={handleCopyPrompt}
       />
     </div>
+  );
+};
+
+// Main App component with providers
+function App() {
+  return (
+    <AppProviders>
+      <AppContent />
+    </AppProviders>
   );
 }
 

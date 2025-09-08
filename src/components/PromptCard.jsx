@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
 import {
   User,
   Download,
@@ -8,6 +9,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useUnsplashPhoto } from "../hooks/useUnsplashPhoto";
+import { fadeInUp, hoverScale, staggerItem, magneticHover, spectacularEntrance } from "../utils/animations";
 
 // Enhanced category query mapping for better Unsplash relevance
 const getCategoryQuery = (category) => {
@@ -68,7 +70,7 @@ const withSig = (url, sig) => `${url}${url.includes("?") ? "&" : "?"}sig=${sig}`
 const picsum = (seed, w = 400, h = 250) => 
   `https://picsum.photos/seed/${encodeURIComponent(seed)}/${w}/${h}`;
 
-const PromptCard = ({ prompt, onViewDetails }) => {
+const PromptCard = React.memo(({ prompt, onViewDetails }) => {
   // Get Unsplash photo with professional API integration and lazy loading
   const unsplashQuery = getCategoryQuery(prompt.category);
   const { src: apiSrc, attribution, triggerDownloadOnce, elementRef } = useUnsplashPhoto(unsplashQuery);
@@ -118,138 +120,162 @@ const PromptCard = ({ prompt, onViewDetails }) => {
   };
 
   return (
-    <div
+    <motion.div
       ref={elementRef}
       onClick={handleCardClick}
+      variants={staggerItem}
+      whileHover={magneticHover}
+      whileTap={{ scale: 0.98 }}
       className="
-        relative group cursor-pointer
-        bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50
-        hover:border-gray-500/80 hover:shadow-[0_20px_70px_rgba(0,0,0,0.3)]
-        transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1)
-        hover:transform hover:-translate-y-1 hover:scale-[1.02]
-        overflow-hidden animate-fade-in
+        relative group cursor-pointer h-full
+        glass-strong rounded-3xl border border-white/20
+        shadow-glow hover:shadow-colorful
+        overflow-hidden backdrop-blur-xl
+        transition-all duration-500
       "
-      style={{
-        background: `
-          linear-gradient(135deg, rgba(17, 24, 39, 0.8) 0%, rgba(31, 41, 55, 0.6) 100%),
-          linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%)
-        `,
-        boxShadow: `
-          inset 0 1px 0 rgba(255, 255, 255, 0.05),
-          0 1px 3px rgba(0, 0, 0, 0.4),
-          0 4px 16px rgba(0, 0, 0, 0.2)
-        `,
-      }}
     >
-      {/* Professional Image System with Cascade Fallbacks */}
-      <div className="relative h-48 overflow-hidden rounded-t-2xl">
+      {/* Spectacular Image Header with Modern Overlay */}
+      <div className="relative h-56 overflow-hidden">
         {currentSrc ? (
-          <img
+          <motion.img
             src={currentSrc}
             alt={prompt.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover"
             onError={handleImageError}
             loading="lazy"
             decoding="async"
             referrerPolicy="no-referrer"
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
           />
         ) : (
-          // Final fallback: CSS Gradient
-          <div
-            className={`w-full h-full bg-gradient-to-br ${categoryImages.gradient} transition-transform duration-300 group-hover:scale-105 flex items-center justify-center`}
+          // Gradient fallback with animated background
+          <motion.div
+            className={`w-full h-full bg-gradient-to-br ${categoryImages.gradient} flex items-center justify-center relative`}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <div className="text-center text-white/80">
-              <div className="text-xl font-bold mb-2">{prompt.category}</div>
-              <div className="text-sm opacity-60">Category Image</div>
+            <div className="text-center text-white/90 z-10">
+              <motion.div 
+                className="text-2xl font-bold mb-2"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                {prompt.category}
+              </motion.div>
+              <div className="text-sm opacity-80">Category Image</div>
             </div>
-          </div>
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
+            </div>
+          </motion.div>
         )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        {/* Modern gradient overlay with glassmorphism */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
 
-        {/* Category badge on image */}
-        <div className="absolute top-4 left-4">
-          <div
-            className="
-            flex items-center gap-2 px-3 py-1.5 rounded-lg
-            bg-black/60 backdrop-blur-sm
-            border border-white/10
-            transition-all duration-300
-          "
-          >
-            <span className="text-xs font-medium text-white uppercase tracking-wider font-geist">
+        {/* Animated Category Badge */}
+        <motion.div 
+          className="absolute top-4 left-4"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <div className="glass-strong px-4 py-2 rounded-xl border border-white/30 shadow-colorful">
+            <span className="text-xs font-semibold text-foreground uppercase tracking-wider font-geist bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               {prompt.category}
             </span>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Hover Action Icon */}
-        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <div className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center">
-            <ArrowUpRight className="h-4 w-4 text-white" />
+        {/* Interactive Hover Action */}
+        <motion.div 
+          className="absolute top-4 right-4"
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileHover={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        >
+          <div className="w-10 h-10 rounded-xl glass-strong border border-white/30 flex items-center justify-center shadow-colorful">
+            <ArrowUpRight className="h-5 w-5 text-accent" />
           </div>
-        </div>
+        </motion.div>
+
+        {/* Floating accent elements */}
+        <div className="absolute bottom-4 right-4 w-2 h-2 bg-accent rounded-full animate-pulse" />
+        <div className="absolute bottom-6 right-8 w-1 h-1 bg-primary rounded-full animate-ping" />
       </div>
 
-      <div className="relative p-6">
-        {/* Enhanced Title */}
-        <h3 className="text-xl font-semibold text-white mb-3 leading-tight line-clamp-2 font-geist group-hover:text-gray-50 transition-colors">
+      <div className="relative p-8">
+        {/* Modern Title with Gradient */}
+        <motion.h3 
+          className="text-2xl font-bold text-foreground mb-4 leading-tight line-clamp-2 font-geist"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        >
           {prompt.title}
-        </h3>
+        </motion.h3>
 
-        {/* Enhanced Description */}
-        <p className="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-6 font-geist">
+        {/* Enhanced Description with better typography */}
+        <p className="text-muted-foreground text-base leading-relaxed line-clamp-3 mb-6 font-geist">
           {prompt.description}
         </p>
 
-        {/* Metadata */}
-        <div className="flex items-center justify-between text-xs text-gray-400 mb-4 font-geist">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
-              <User className="h-3 w-3" />
-              <span className="font-medium">{prompt.author}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Calendar className="h-3 w-3" />
-              <span>{formatDate(prompt.dateCreated)}</span>
-            </div>
-          </div>
+        {/* Clean metadata - Only real information */}
+        <div className="flex items-center justify-between text-sm mb-6 font-geist">
+          <motion.div 
+            className="flex items-center gap-2 glass-panel px-4 py-2 rounded-xl"
+            whileHover={{ scale: 1.02 }}
+          >
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            <span className="text-foreground font-medium">New Prompt</span>
+          </motion.div>
 
-          <div className="flex items-center gap-1.5 font-medium bg-gray-800/40 px-2 py-1 rounded-md">
-            <Download className="h-3 w-3" />
-            <span>{formatDownloads(prompt.downloads)}</span>
-          </div>
+          <motion.div 
+            className="flex items-center gap-2 glass-strong px-4 py-2 rounded-xl border border-white/20 shadow-glow"
+            whileHover={{ scale: 1.02 }}
+          >
+            <Download className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground font-medium">0 downloads</span>
+          </motion.div>
         </div>
 
-        {/* Enhanced Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-700/40">
-          <span className="text-xs text-gray-500 font-geist">
-            Click to preview
-          </span>
+        {/* Spectacular Interactive Footer */}
+        <div className="flex items-center justify-between pt-6 border-t border-border/20">
+          <motion.span 
+            className="text-sm text-muted-foreground font-geist flex items-center gap-2"
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="w-2 h-2 bg-accent rounded-full" />
+            Click to explore
+          </motion.span>
 
-          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-            <button
-              className="inline-flex items-center gap-1.5 rounded-lg bg-gray-800/60 hover:bg-gray-700/60 px-3 py-1.5 text-xs font-medium text-gray-300 hover:text-white transition-all font-geist border border-gray-600/30 hover:border-gray-500/50"
+          <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <motion.button
+              className="inline-flex items-center gap-2 rounded-xl gradient-primary px-4 py-2 text-sm font-semibold text-white shadow-colorful"
               onClick={(e) => {
                 e.stopPropagation();
                 void triggerDownloadOnce();
-                // Handle quick copy logic here
               }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <Copy className="h-3 w-3" />
+              <Copy className="h-4 w-4" />
               Copy
-            </button>
-            <button 
-              className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 hover:bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition-all font-geist border border-gray-500/30 hover:border-gray-400/50"
+            </motion.button>
+            
+            <motion.button 
+              className="inline-flex items-center gap-2 rounded-xl glass-strong border border-white/30 px-4 py-2 text-sm font-semibold text-foreground hover:shadow-colorful"
               onClick={(e) => {
                 e.stopPropagation();
                 void triggerDownloadOnce();
               }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <ExternalLink className="h-3 w-3" />
+              <ExternalLink className="h-4 w-4" />
               View
-            </button>
+            </motion.button>
           </div>
         </div>
 
@@ -291,8 +317,20 @@ const PromptCard = ({ prompt, onViewDetails }) => {
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
         <div className="absolute inset-px rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent" />
       </div>
-    </div>
+    </motion.div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function to prevent unnecessary re-renders
+  return (
+    prevProps.prompt.id === nextProps.prompt.id &&
+    prevProps.prompt.title === nextProps.prompt.title &&
+    prevProps.prompt.description === nextProps.prompt.description &&
+    prevProps.prompt.downloads === nextProps.prompt.downloads &&
+    prevProps.onViewDetails === nextProps.onViewDetails
+  );
+});
+
+// Set display name for debugging
+PromptCard.displayName = 'PromptCard';
 
 export default PromptCard;

@@ -1,15 +1,18 @@
-# PromptHub - Development Guide
+# WARP.md
+
+This file provides guidance to WARP (warp.dev) when working with code in this repository.
 
 ## Project Overview
 
-**PromptHub** is an AI prompt marketplace inspired by Raycast's design philosophy. It allows users to discover, preview, and share AI prompts for various workflows without requiring authentication.
+**PromptHub** is an AI prompt marketplace built with React 18, Vite, and shadcn/ui. It features a Raycast-inspired dark theme with glassmorphism effects and has been migrated from custom CSS to Tailwind CSS with shadcn/ui components.
 
 ### Key Features
-- **Enhanced Search**: Prominent search bar with real-time filtering
-- **Interactive Demo**: Edit and test prompts before copying
-- **Download Tracking**: LocalStorage-based download counters
+- **Enhanced Search**: Prominent search bar with real-time filtering and XSS prevention
+- **Interactive Modal**: Edit and test prompts before copying using Radix UI Dialog
+- **Download Tracking**: LocalStorage-based download counters with validation
+- **Superpower Filtering**: 9 different "superpowers" for semantic prompt discovery
 - **Category Filtering**: 7 main categories for prompt organization
-- **Raycast-Inspired UI**: Dark theme with glassmorphism effects
+- **Modern UI**: Linear.app-inspired grayscale theme with shadcn/ui components
 
 ---
 
@@ -86,47 +89,123 @@ App.js
 
 ---
 
+## Common Commands
+
+### Development
+```bash
+# Start development server (auto-opens at localhost:3000)
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+### Testing
+```bash
+# Run all tests in watch mode
+npm run test
+
+# Run tests with UI dashboard
+npm run test:ui
+
+# Run tests once (CI mode)
+npm run test:run
+
+# Run specific test file
+npm run test -- PromptCard.test.jsx
+
+# Run tests matching pattern
+npm run test -- --reporter=verbose
+```
+
+### Key Development Files
+- `vite.config.js` - Vite configuration with React plugin
+- `vitest.config.js` - Test configuration with jsdom environment
+- `tailwind.config.js` - Tailwind CSS with shadcn/ui theme tokens
+- `src/test/setup.js` - Test environment setup with mocks
+
+---
+
 ## Technical Architecture
 
 ### Tech Stack
 - **Frontend**: React 18 with functional components and hooks
-- **Styling**: CSS custom properties (CSS variables) with utility classes
-- **Data**: Static mock data in JavaScript files
-- **Storage**: Browser LocalStorage for download tracking
-- **Build**: Create React App (CRA) setup
+- **Build Tool**: Vite 7.1.4 with hot module replacement
+- **UI Library**: shadcn/ui with Radix UI primitives
+- **Styling**: Dual system - Tailwind CSS + legacy CSS custom properties
+- **Icons**: Lucide React
+- **Testing**: Vitest + React Testing Library + jsdom
+- **Data**: Static mock data with client-side search/filtering
+- **Storage**: Browser LocalStorage for download tracking (with validation)
 
-### File Structure
+### Current File Structure
 ```
 src/
-├── components/           # React components
-│   ├── Header.js
-│   ├── CategoryFilter.js
-│   ├── PromptCard.js
-│   └── PromptModal.js
+├── components/           # React components (.jsx)
+│   ├── Header.jsx       # Navigation, search, stats
+│   ├── CategoryFilter.jsx # Category pill filters
+│   ├── PromptSuperpowers.jsx # Semantic filtering UI
+│   ├── CuratedCollections.jsx # Featured collections
+│   ├── PromptCard.jsx   # Individual prompt display
+│   ├── PromptModal.jsx  # Dialog for editing/copying
+│   ├── ErrorBoundary.jsx # Error handling component
+│   └── ui/              # shadcn/ui components
+│       ├── button.jsx   # Button with variants
+│       ├── dialog.jsx   # Modal dialog component
+│       ├── input.jsx    # Form input component
+│       ├── card.jsx     # Card container components
+│       └── badge.jsx    # Badge/pill component
 ├── data/                # Mock data and utilities
-│   └── prompts.js
+│   └── prompts.js       # Static prompts data + search logic
+├── hooks/               # Custom React hooks
+│   └── useUnsplashPhoto.ts # Photo fetching hook
+├── lib/                 # Utility functions
+│   └── utils.js         # className merging utilities
+├── services/            # External service integrations
 ├── styles/              # CSS files
-│   └── globals.css
-└── App.js              # Main application component
+│   └── globals.css      # Tailwind + custom CSS properties
+├── test/                # Test configuration
+│   └── setup.js         # Test environment setup
+└── utils/               # Security and validation
+    └── security.js      # XSS prevention, rate limiting
+```
+
+### Component Architecture
+
+```
+App.jsx                           # Main app orchestrator
+├── Header.jsx                    # Search, branding, stats
+├── PromptSuperpowers.jsx         # Semantic filtering (9 powers)
+├── CuratedCollections.jsx        # Featured collections section
+├── CategoryFilter.jsx            # Category pill filters
+├── PromptCard.jsx               # Individual prompt display
+└── PromptModal.jsx              # Dialog for editing/copying
+    └── Uses shadcn Dialog component (Radix UI)
 ```
 
 ### Design System
 
-#### Color Palette (Raycast-inspired)
-- **Primary Background**: `#0F1115`
-- **Secondary Background**: `#1B1F24`
-- **Tertiary Background**: `#2A2F36`
-- **Accent Colors**: Coral (`#FF6363`), Mint (`#59D499`), Sky (`#56C2FF`), Saffron (`#FFC531`)
+#### Color Palette (Linear.app-inspired grayscale)
+The project uses HSL color variables for a pure grayscale theme:
+- **Background**: `hsl(0 0% 4%)` - Pure black background
+- **Foreground**: `hsl(0 0% 100%)` - Pure white text
+- **Card**: `hsl(240 2% 8%)` - Subtle card background
+- **Primary**: `hsl(240 1% 15%)` - Medium gray for primary elements
+- **Muted**: `hsl(0 0% 63%)` - Medium gray for muted text
 
 #### Typography
-- **Font Family**: Inter (Google Fonts)
-- **Scale**: Based on rem units with consistent spacing variables
-- **Weights**: 300, 400, 500, 600, 700
+- **Font Family**: Geist (system fallback: -apple-system, BlinkMacSystemFont)
+- **Scale**: Tailwind typography classes with consistent spacing
+- **Features**: Font feature settings for ligatures and contextual alternates
 
 #### Component Patterns
-- **Glass Effect**: `backdrop-filter: blur(20px)` with subtle borders
-- **Hover States**: Subtle transform and shadow changes
-- **Keyboard Focus**: Visible focus states for accessibility
+- **Glass Effects**: `.glass-panel` and `.glass-strong` utility classes
+- **Magnetic Hover**: `.magnetic-hover` with transform and shadow animations
+- **Neumorphism**: `.neomorphic` and `.neomorphic-inset` for soft UI elements
+- **Modern Interactions**: Cubic-bezier transitions and micro-animations
 
 ---
 
@@ -155,48 +234,72 @@ src/
 6. Education
 7. Design & UX
 
+### Superpowers (Semantic Filtering)
+1. **Automate** - Meeting, productivity, workflow automation
+2. **Analyze** - Data analysis, research, review tasks
+3. **Create** - Creative writing, content, social media
+4. **Optimize** - Improvement, enhancement, optimization
+5. **Extract** - Summary, fact extraction, data mining
+6. **Translate** - Conversion, format transformation
+7. **Validate** - Review, checking, validation tasks
+8. **Brainstorm** - Idea generation, creative thinking
+9. **Summarize** - Summary generation, bullet points
+
 ---
 
 ## Key Functions & Features
 
-### Search & Filter (`searchPrompts`)
-- Searches across title, description, and author fields
-- Case-insensitive matching
-- Combines with category filtering
+### Search & Filter System
+- **searchPrompts()**: Searches across title, description, and author fields
+- **Case-insensitive matching** with XSS prevention via `validateSearchQuery()`
+- **Triple filtering**: Combines text search + category + superpower filters
+- **Real-time updates**: UseEffect-driven filtering with dependency array
 
-### Keyboard Shortcuts
-- `Cmd/Ctrl + K`: Focus search input
-- `Escape`: Close modal
+### Security Implementation
+- **Input Sanitization**: All user inputs processed through `utils/security.js`
+- **XSS Prevention**: `sanitizeInput()` escapes HTML entities
+- **Rate Limiting**: Client-side rate limiting for copy operations (50/minute)
+- **LocalStorage Validation**: Safe get/set operations with error handling
 
-### LocalStorage Integration
-- Download counts stored as `prompt-{id}-downloads`
-- Persists between browser sessions
-- No user authentication required
+### Modal System (Radix UI)
+- **shadcn Dialog**: Uses Radix UI primitives for accessibility
+- **Portal Rendering**: Proper z-index management and focus trapping
+- **Keyboard Navigation**: Escape key, focus management
+- **Backdrop Click**: Automatic close on outside click
 
-### Copy-to-Clipboard
-- Uses modern `navigator.clipboard.writeText()`
-- Visual feedback with temporary state change
-- Updates download counter automatically
+### State Management Pattern
+- **Lifted State**: All major state in App.jsx with prop drilling
+- **Local State**: Component-specific state (modal open/close)
+- **Derived State**: Filtered prompts computed from search/category/superpower
+- **Persistent State**: Download counts in validated LocalStorage
 
 ---
 
 ## Styling Guidelines
 
-### CSS Custom Properties
-Use CSS variables for consistency:
-- Spacing: `--spacing-xs` through `--spacing-2xl`
-- Colors: `--bg-primary`, `--accent-coral`, etc.
-- Radius: `--radius-sm` through `--radius-xl`
+### Dual Styling System
+The project uses both Tailwind and legacy CSS during migration:
 
-### Utility Classes
-- Typography: `.text-xs`, `.font-semibold`, etc.
-- Layout: `.flex`, `.items-center`, `.gap-md`, etc.
-- Components: `.btn`, `.glass`, `.badge`, etc.
+#### Tailwind CSS (Primary)
+- **shadcn/ui components**: Use `cn()` utility from `lib/utils.js` for className merging
+- **HSL Color Variables**: `hsl(var(--background))` format for theme tokens
+- **Responsive Design**: Tailwind responsive prefixes (`md:`, `lg:`, `xl:`)
+- **Typography**: Tailwind classes with Geist font family
+
+#### Legacy CSS Properties (Being Migrated)
+- **Custom Properties**: Still used in `globals.css` for some components
+- **Utility Classes**: `.glass-panel`, `.magnetic-hover`, `.neomorphic`
+- **Animations**: Custom keyframes for float, gradient-shift, etc.
+
+### Component File Extensions
+- **React Components**: Use `.jsx` extension
+- **Utilities**: Use `.js` extension
+- **TypeScript**: Limited to specific hooks (`.ts` extension)
 
 ### Responsive Design
-- Mobile-first approach
-- Grid layout adjusts with `auto-fill` and `minmax(350px, 1fr)`
-- Consistent spacing on all screen sizes
+- **Mobile-first approach**: Tailwind breakpoint system
+- **Grid Layout**: `auto-fill` with `minmax(350px, 1fr)` for prompt cards
+- **Container**: Tailwind container with center and padding utilities
 
 ---
 
@@ -222,19 +325,51 @@ Use CSS variables for consistency:
 
 ---
 
+## Testing Infrastructure
+
+### Test Setup
+- **Framework**: Vitest with jsdom environment
+- **Testing Library**: React Testing Library + jest-dom
+- **Setup File**: `src/test/setup.js` with global mocks
+- **Coverage**: Test coverage tracking available
+
+### Mock Configuration
+```javascript
+// Global mocks in setup.js
+- fetch API mock with vi.fn()
+- AbortController mock for request cancellation
+- sessionStorage mock for testing
+- Environment variables (VITE_UNSPLASH_ACCESS_KEY)
+```
+
+### Running Tests
+```bash
+# Run single test file
+npm run test -- PromptCard.test.jsx
+
+# Run tests with coverage
+npm run test -- --coverage
+
+# Watch mode for specific directory
+npm run test -- src/components/__tests__
+```
+
+---
+
 ## Deployment Notes
 
 ### Build Process
 ```bash
-npm run build      # Creates optimized production build
-npm start         # Runs development server
+npm run build      # Creates optimized production build in dist/
+npm run dev        # Runs development server at localhost:3000
+npm run preview    # Preview production build locally
 ```
 
 ### Static Hosting Requirements
-- Any static hosting service (Vercel, Netlify, GitHub Pages)
-- No server-side requirements
-- No database dependencies
-- Environment variables not required for basic functionality
+- **Hosting**: Any static hosting service (Vercel, Netlify, GitHub Pages)
+- **Build Output**: `dist/` directory from Vite build
+- **Environment**: No server-side requirements or database
+- **Optional**: VITE_UNSPLASH_ACCESS_KEY for photo features
 
 ---
 
