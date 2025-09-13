@@ -36,7 +36,26 @@ export const SearchProvider = ({ children }) => {
     return superpowerMap[superpower] || [];
   }, [superpowerMap]);
 
-  // Memoized filter function by superpower
+  // Memoized filtered prompts - optimized performance
+  const filteredPrompts = useMemo(() => {
+    let results = searchPrompts(searchQuery, selectedCategory);
+    
+    // Apply superpower filtering directly in the memoization
+    if (selectedSuperpower) {
+      const keywords = getSuperpowerKeywords(selectedSuperpower);
+      results = results.filter(prompt => 
+        keywords.some(keyword => 
+          prompt.title.toLowerCase().includes(keyword) ||
+          prompt.description.toLowerCase().includes(keyword) ||
+          prompt.prompt.toLowerCase().includes(keyword)
+        )
+      );
+    }
+    
+    return results;
+  }, [searchQuery, selectedCategory, selectedSuperpower, getSuperpowerKeywords]);
+
+  // Memoized filter function by superpower (kept for external use)
   const filterBySuperpower = useCallback((prompts, superpower) => {
     if (!superpower) return prompts;
     
@@ -49,18 +68,6 @@ export const SearchProvider = ({ children }) => {
       )
     );
   }, [getSuperpowerKeywords]);
-
-  // Memoized filtered prompts - optimized performance
-  const filteredPrompts = useMemo(() => {
-    let results = searchPrompts(searchQuery, selectedCategory);
-    
-    // Apply superpower filtering
-    if (selectedSuperpower) {
-      results = filterBySuperpower(results, selectedSuperpower);
-    }
-    
-    return results;
-  }, [searchQuery, selectedCategory, selectedSuperpower, filterBySuperpower]);
 
   // Reset all filters
   const resetFilters = useCallback(() => {

@@ -235,7 +235,7 @@ const PromptCard = React.memo(({ prompt, onViewDetails }) => {
             whileHover={{ scale: 1.02 }}
           >
             <Download className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground font-medium">0 downloads</span>
+            <span className="text-muted-foreground font-medium">{formatDownloads(prompt.downloads || 0)} downloads</span>
           </motion.div>
         </div>
 
