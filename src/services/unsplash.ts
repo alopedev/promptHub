@@ -118,7 +118,29 @@ export async function fetchRandomPhoto(
     return null;
   }
 
-  const key = `search:${query.toLowerCase()}`;
+  // Validate and sanitize query input
+  if (!query || typeof query !== 'string') {
+    if (import.meta.env.DEV) {
+      console.warn('[Unsplash] Invalid query parameter');
+    }
+    return null;
+  }
+
+  // Sanitize query to prevent injection attacks
+  const sanitizedQuery = query
+    .trim()
+    .replace(/[<>"'&]/g, '') // Remove potentially dangerous characters
+    .substring(0, 100) // Limit length to prevent abuse
+    .toLowerCase();
+
+  if (!sanitizedQuery) {
+    if (import.meta.env.DEV) {
+      console.warn('[Unsplash] Query is empty after sanitization');
+    }
+    return null;
+  }
+
+  const key = `search:${sanitizedQuery}`;
   const now = Date.now();
   
   // Check cache first
@@ -127,7 +149,7 @@ export async function fetchRandomPhoto(
     hit.hits++;
     metrics.cacheHits++;
     if (import.meta.env.DEV) {
-      console.log(`[Unsplash] ${query}: cache HIT`);
+      console.log(`[Unsplash] ${sanitizedQuery}: cache HIT`);
     }
     return hit.photo;
   }
@@ -136,7 +158,7 @@ export async function fetchRandomPhoto(
     // Use search endpoint for better relevance
     const url = 
       `https://api.unsplash.com/search/photos` +
-      `?query=${encodeURIComponent(query)}` +
+      `?query=${encodeURIComponent(sanitizedQuery)}` +
       `&orientation=landscape` +
       `&content_filter=high` +
       `&per_page=30`; // Get more results to select from
@@ -177,7 +199,7 @@ export async function fetchRandomPhoto(
     metrics.apiCalls++;
     
     if (import.meta.env.DEV) {
-      console.log(`[Unsplash] ${query}: Search successful, selected ${randomIndex + 1}/${searchResult.results.length}`);
+      console.log(`[Unsplash] ${sanitizedQuery}: Search successful, selected ${randomIndex + 1}/${searchResult.results.length}`);
     }
     
     return selectedPhoto;
@@ -185,7 +207,7 @@ export async function fetchRandomPhoto(
   } catch (error) {
     metrics.errors++;
     if (import.meta.env.DEV) {
-      console.warn(`[Unsplash] ${query}: Search failed`, error);
+      console.warn(`[Unsplash] ${sanitizedQuery}: Search failed`, error);
     }
     return null;
   }
